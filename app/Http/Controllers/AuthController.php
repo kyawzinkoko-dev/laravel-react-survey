@@ -55,4 +55,8 @@ class AuthController extends Controller
             'success'=>true
         ])->header('Access-Control-Allow-Origin', 'http://localhost:3000');
     }
+    public function me(Request $request)
+    {
+        return $request->user();
+    }
 }

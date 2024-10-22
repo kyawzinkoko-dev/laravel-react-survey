@@ -25,7 +25,7 @@ class StoreSurveyRequest extends FormRequest
     {
         return [
             'title'=>'required|max:1000|string',
-            'image'=>'nullable|string',
+            'image'=>'required|string',
             'user_id'=>'exists:users,id',
             'status'=>'required|boolean',
             'description'=>'nullable|string',

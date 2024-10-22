@@ -28,7 +28,7 @@ function classNames(...classes) {
 export default function DefaultLayout() {
     const { currentUser, setCurrentUser, setUserToken, userToken } =
         useAuthContext();
-    console.log(userToken);
+    
     const logout = (e) => {
         e.preventDefault();
         axiosClient
@@ -40,7 +40,12 @@ export default function DefaultLayout() {
             })
             .catch((e) => console.log(e.response));
     };
-
+useEffect(()=>{
+    axiosClient.get('/me').then(({data})=>{
+     
+        setCurrentUser(data)
+    }).catch(e=>console.log(e))
+},[])
     if (!userToken) {
         return <Navigate to="login" />;
     }
@@ -174,11 +179,7 @@ export default function DefaultLayout() {
                         <div className="border-t border-gray-700 pb-3 pt-4">
                             <div className="flex items-center px-5">
                                 <div className="flex-shrink-0">
-                                    <img
-                                        alt=""
-                                        src={currentUser.imageUrl}
-                                        className="h-10 w-10 rounded-full"
-                                    />
+                                <UserCircleIcon className="h-8 w-8 rounded-full" />
                                 </div>
                                 <div className="ml-3">
                                     <div className="text-base font-medium leading-none text-white">

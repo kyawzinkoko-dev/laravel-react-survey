@@ -5,31 +5,32 @@ import { useAuthContext } from "../context/AuthContext";
 import { useEffect } from "react";
 
 export default function QuestionEditor({
-    index,
+    index =0,
     addQuestion,
     questionChange,
     deleteQuestion,
     question,
 }) {
-    const [model, setModel] = useState({ ...question }); //TODO
+    const [model, setModel] = useState({...question} ); //TODO
    
     const { questionType } = useAuthContext();
     useEffect(() => {
         questionChange(model)
-    }, []);
+    }, [model]);
     const uppserCaseFirst = (str) =>{
         return str.charAt(0).toUpperCase()+str.slice(1);
     }
     return (
         <div>
             <div className="flex justify-between ">
+             
                 <h4>
                     {index + 1}. {model.question}
                 </h4>
                 <div className="flex items-center gap-4">
                     <button
                         type="button"
-                        onClick={addQuestion}
+                        onClick={()=>addQuestion(index+1)}
                         className="bg-gray-500 flex items-center gap-1 text-white hover:bg-gray-600 py-1 rounded-sm px-3 text-sm"
                     >
                         <PlusIcon className="w-5 h-5" /> Add

@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import axiosClient from "../axios";
 import { useAuthContext } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -102,6 +103,7 @@ export default function Login() {
                             Sign in
                         </button>
                     </div>
+                    <p className="text-center">Don't have an account ? <Link to="/signup" className="text-indigo-500 hover:text-indigo-600">Sign up</Link></p>
                 </form>
             </div>
         </>

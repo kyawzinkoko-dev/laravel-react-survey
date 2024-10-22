@@ -49,16 +49,15 @@ export default function SurveyView() {
             })
             .catch((e) => {
                 if (e.response.data) {
-                console.log(e.response);
+                    console.log(e.response);
                     setError(e.response.data.message);
                 }
             });
     };
 
-        const onSurveyUpdate = (survey)=>{
-
-            setSurvey({...survey})
-        }
+    const onSurveyUpdate = (questions) => {
+        setSurvey({ ...survey, questions });
+    };
     return (
         <PageComponent title="Create Survey">
             <form
@@ -69,6 +68,7 @@ export default function SurveyView() {
             >
                 <div className="shadow sm:overflow-hidden sm:rounded-md">
                     <div className="space-y-6 bg-whie px-4 py-5 sm:p-6">
+                      
                         {error && (
                             <div className="bg-red-500 text-white py-2 px-3">
                                 {error}
@@ -192,7 +192,10 @@ export default function SurveyView() {
                             </div>
                         </div>
                         {/* //Active */}
-                                    <SurveyQuestion survey={survey} onSurveyUpdate={onSurveyUpdate}/>
+                        <SurveyQuestion
+                            questions={survey.questions}
+                            onQuestionUpdate={onSurveyUpdate}
+                        />
                     </div>
                     <div className="bg-gray-50 px-4 py-3 text-right sm:px-6">
                         <TButton>Save</TButton>

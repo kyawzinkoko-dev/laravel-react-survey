@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Enums\QuestionTypeEnum;
 use App\Http\Resources\SurveyResource;
 use App\Models\Survey;
@@ -22,7 +21,7 @@ class SurveyController extends Controller
      */
     public function index(Request $request)
     {
-        dd('here');
+    
         $user = $request->user();
         return SurveyResource::collection(Survey::where('user_id', $user->id)->orderBy('created_at', 'desc')->paginate(10));
 
@@ -41,10 +40,12 @@ class SurveyController extends Controller
             $relativePath = $this->saveImage($data['image']);
             $data['image'] = $relativePath;
         }
+        //dd($data);
         $survey = Survey::create($data);
         //create new questoin 
         foreach ($data['questions'] as $question) {
-            $question['suvey_id'] = $survey->id;
+            $question['survey_id'] = $survey->id;
+            $this->createQuestion($question);
 
         }
         return new SurveyResource($survey);
@@ -157,12 +158,13 @@ class SurveyController extends Controller
         if (is_array($data['data'])) {
             $data['data'] = json_encode($data['data']);
         }
+      
         $validator = Validator::make($data, [
             'question' => 'required|string',
-            'type' => ['required', new Enum(QuestionTypeEnum::class)],
+            'type' => ['required', new Enum(QuestionTypeEnum::class) ],//'in:text,textarea,select,radio,checkbox,text'],
             'description' => 'nullable|string',
             'data' => 'present',
-            'survey_id' => 'exitst:\App\Models\Survey,id'
+            'survey_id' => 'exists:App\Models\Survey,id'
         ]);
         SurveyQuestion::create($validator->validated());
     }
