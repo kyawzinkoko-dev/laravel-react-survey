@@ -2,14 +2,14 @@ import React from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import axiosClient from "../axios";
-import { useAuthContext } from "../context/AuthContext";
+import { useStateContext } from "../context/StateContext";
 const Signup = () => {
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState({ __html: "" });
-    const { setCurrentUser, setUserToken } = useAuthContext();
+    const { setCurrentUser, setUserToken } = useStateContext();
 
     const handleSubmit = (e) => {
         e.preventDefault();

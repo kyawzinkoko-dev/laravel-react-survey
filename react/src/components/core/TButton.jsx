@@ -12,6 +12,8 @@ export default function TButton({
 }) {
     let classes = [
         "flex",
+        "items-center",
+        "justify-center",
         "whitespace-nowarp",
         "text-sm",
         "border",

@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 use App\Enums\QuestionTypeEnum;
+use App\Http\Requests\StoreSurveyAnswerRequest;
 use App\Http\Resources\SurveyResource;
 use App\Models\Survey;
 use App\Http\Requests\StoreSurveyRequest;
 use App\Http\Requests\UpdateSurveyRequest;
+use App\Models\SurveyAnswer;
 use App\Models\SurveyQuestion;
-use Arr;
+//use Illuminate\Support\Arr;
+use App\Models\SurveyQuestionAnswer;
 use File;
+use Arr;
+use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Enum;
-use Request;
 use Str;
 use Validator;
 
@@ -21,9 +25,12 @@ class SurveyController extends Controller
      */
     public function index(Request $request)
     {
-    
+
         $user = $request->user();
-        return SurveyResource::collection(Survey::where('user_id', $user->id)->orderBy('created_at', 'desc')->paginate(10));
+        return SurveyResource::collection(
+             Survey::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(3));
 
     }
 
@@ -56,7 +63,7 @@ class SurveyController extends Controller
      */
     public function show(Survey $survey, Request $request)
     {
-        dd('here');
+       // dd('here');
         $user = $request->user();
         if ($survey->user_id !== $user->id) {
             return abort(403, 'Unauthorized');
@@ -86,10 +93,14 @@ class SurveyController extends Controller
             $relativePath = public_path($survey->image);
             File::delete($relativePath);
         }
+        //dd($data);
         $survey->update($data);
-        $existingIds = $survey->question()->pluck('id');
-        $newIds = Arr::pluck($data['question'], 'id');
+        $existingIds = $survey->questions()->pluck('id')->toArray();
+
+        $newIds = Arr::pluck($data['questions'], 'id');
+        
         $toDelte = array_diff($existingIds, $newIds);
+        //dd($toDelte);   
         $toAdd = array_diff($newIds, $existingIds);
         SurveyQuestion::destroy($toDelte);
         foreach ($data['questions'] as $question) {
@@ -164,7 +175,7 @@ class SurveyController extends Controller
             'type' => ['required', new Enum(QuestionTypeEnum::class) ],//'in:text,textarea,select,radio,checkbox,text'],
             'description' => 'nullable|string',
             'data' => 'present',
-            'survey_id' => 'exists:App\Models\Survey,id'
+            'survey_id' => 'exists:surveys,id'
         ]);
         SurveyQuestion::create($validator->validated());
     }
@@ -173,12 +184,49 @@ class SurveyController extends Controller
         if (is_array($data['data'])) {
             $data['data'] = json_encode($data['data']);
             $validator = Validator::make($data, [
-                'id' => 'App\Models\SurveyQuestion,id',
+                'id' => 'exists:survey_questions,id',
                 'question' => 'required|string',
+                'type' => ['required', new Enum(QuestionTypeEnum::class) ],
                 'description' => 'nullable|string',
                 'data' => 'present',
             ]);
             $question->update($validator->validated());
         }
+    }
+
+    public function getBySlug(Survey $survey){
+        if(!$survey->status){
+            return response("",404);
+        }
+        $now = new \DateTime();
+        $expireDate = new \DateTime($survey->expire_date);
+        if($now > $expireDate){
+            return response("",404);
+        }
+        return new SurveyResource($survey);
+    }
+    public function storeAnswer(StoreSurveyAnswerRequest $request,Survey $survey){
+        $data = $request->validated();
+        $surveyAnswer =SurveyAnswer::create([
+            'survey_id'=>$survey->id,
+            'start_date'=>date('Y-m-d H:i:s'),
+            'end_date'=>date('Y-m-d H:i:s')
+        ]);
+       // dd($data);
+        foreach($data['answers'] as $questionId => $answer){
+            $question = SurveyQuestion::where(['id'=>$questionId,'survey_id'=>$survey->id])->get();
+            
+            if(!$question){
+                return response("Invalid question ID {$questionId}" , 400);
+            }
+            $data=[
+                'survey_question_id'=>$questionId,
+                'survey_answer_id'=>$surveyAnswer->id,
+                'answer'=>is_array($answer) ? json_encode($answer) : $answer
+            ];
+            $questionAnswer = SurveyQuestionAnswer::create($data);
+
+        }
+        return response("",201);
     }
 }

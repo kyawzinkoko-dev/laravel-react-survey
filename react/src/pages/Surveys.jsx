@@ -1,27 +1,56 @@
 import React, { useState } from "react";
 import PageCompoment from "../components/PageComponent";
-import { useAuthContext } from "../context/AuthContext";
+import { useStateContext } from "../context/StateContext";
 import SurveyListItem from "../components/SurveyListItem";
 import TButton from "../components/core/TButton";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { useEffect } from "react";
 import axosClient from "../axios";
+import PaginationLink from "../components/PaginationLink";
+import LoadingSpinner from "../components/LoadingSpinner";
+import axiosClient from "../axios";
+import Toast from "../components/Toast";
 
 const Surveys = () => {
-    //const {surveys}= useAuthContext()
+    const {showToast}= useStateContext()
     const [surveys, setSurvey] = useState([]);
-    console.log(surveys);
-    const onDeleteClick = () => {
-        console.log("on delte click ");
+    const [loading, setLoading] = useState(false);
+    const [meta, setMeta] = useState({});
+
+    const onDeleteClick = (id) => {
+        if (!id) return;
+        if (window.confirm("Are you sure you want to delete survey")) {
+            setLoading(true);
+            axiosClient
+                .delete(`/survey/${id}`)
+                .then(({ data }) => {
+                    showToast("Survey Deleted Successfully")
+                    getSurvey();
+                    setLoading(false);
+                })
+                .catch((e) => console.log(e));
+        }
     };
-    useEffect(() => {
+
+    const getSurvey = (url) => {
+        url = url || "survey";
+        setLoading(true);
         axosClient
-            .get("survey")
+            .get(url)
             .then(({ data }) => {
                 console.log(data);
-                setSurvey(data)
+                setSurvey(data.data);
+                setMeta(data.meta);
+                setLoading(false);
             })
             .catch((e) => console.log(e));
+    };
+
+    const onPageClick = (link) => {
+        getSurvey(link.url);
+    };
+    useEffect(() => {
+        getSurvey();
     }, []);
     return (
         <PageCompoment
@@ -32,15 +61,26 @@ const Surveys = () => {
                 </TButton>
             }
         >
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
-                {surveys.map((survey) => (
-                    <SurveyListItem
-                        key={survey.id}
-                        survey={survey}
-                        onDeleteClick={onDeleteClick}
-                    />
-                ))}
-            </div>
+            {loading && <LoadingSpinner />}
+            {!loading && (
+                <div>
+                    {surveys.length === 0 && (
+                        <div className="flex justify-center items-center sm:text-xl  ">You don't have any survey</div>
+                    )}
+                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
+                        {surveys.length >0 && surveys.map((survey) => (
+                            <SurveyListItem
+                                key={survey.id}
+                                survey={survey}
+                                onDeleteClick={onDeleteClick}
+                            />
+                        ))}
+                    </div>
+
+                    {surveys.length > 0 && <PaginationLink meta={meta} onPageClick={onPageClick} />}
+                    <Toast />
+                </div>
+            )}
         </PageCompoment>
     );
 };

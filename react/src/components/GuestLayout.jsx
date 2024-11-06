@@ -1,9 +1,9 @@
 import React from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
-import { useAuthContext } from '../context/AuthContext'
+import { useStateContext } from '../context/StateContext'
 
 function GuestLayout() {
-  const {currentUser,userToken}= useAuthContext()
+  const {currentUser,userToken}= useStateContext()
     if(userToken){
       return <Navigate to="dashboard"/>
     }

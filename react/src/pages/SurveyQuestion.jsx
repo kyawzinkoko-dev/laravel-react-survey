@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import QuestionEditor from "./QuestionEditor";
 export default function SurveyQuestion({ questions, onQuestionUpdate }) {
     const [myQuestions,setMyQuestions ] = useState([...questions]);
+    console.log(myQuestions)
     const addQuestion = (index) => {
         index = index !== undefined ? index : questions.length;
         questions.splice(index, 0, {
@@ -18,10 +19,14 @@ export default function SurveyQuestion({ questions, onQuestionUpdate }) {
     };
     const onQuestionChange = (question) => {
         if (!question) return;
-        const newQuestion = questions.map((q) => {
+      
+          const newQuestion = myQuestions.map((q) => {
+            console.log('trigger')
             if (q.id === question.id) {
+                console.log(q)
                 return { ...question };
             } else {
+               
                 return q;
             }
         });

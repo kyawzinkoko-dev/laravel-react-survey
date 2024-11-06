@@ -9,7 +9,7 @@ import {
 } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Navigate, NavLink, Outlet } from "react-router-dom";
-import { useAuthContext } from "../context/AuthContext";
+import { useStateContext } from "../context/StateContext";
 import { useEffect } from "react";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
 import axios from "axios";
@@ -27,7 +27,7 @@ function classNames(...classes) {
 
 export default function DefaultLayout() {
     const { currentUser, setCurrentUser, setUserToken, userToken } =
-        useAuthContext();
+        useStateContext();
     
     const logout = (e) => {
         e.preventDefault();

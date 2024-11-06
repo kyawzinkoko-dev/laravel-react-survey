@@ -8,7 +8,7 @@ import TButton from "./core/TButton";
 
 export default function SurveyListItem({ survey,onDeleteClick }) {
     return (
-        <div className="flex flex-col py-4 px-6 shadow-md bg-white hover:bg-gray-50 h-[470px]">
+        <div className="flex flex-col py-4 px-6 shadow-md bg-white hover:bg-gray-50 h-[400px]">
             <img
                 src={survey.image_url}
                 alt={survey.title}
@@ -20,7 +20,7 @@ export default function SurveyListItem({ survey,onDeleteClick }) {
                 className="flex-1 overflow-hidden"
             ></div>
             <div className="flex justify-between items-center mt-5">
-                <TButton to={`survey/${survey.id}`}>
+                <TButton to={`/survey/${survey.id}`}>
                     <PencilIcon className="h-5 w-5 mr-2" />
                     Edit
                 </TButton>
@@ -30,7 +30,7 @@ export default function SurveyListItem({ survey,onDeleteClick }) {
                     <ArrowTopRightOnSquareIcon className="h-5 w-5" />
                 </TButton>
                 {survey.id && (
-                    <TButton onClick={onDeleteClick} circle link color="red">
+                    <TButton onClick={()=>onDeleteClick(survey.id)} circle link color="red">
                         <TrashIcon className="h-5 w-5" />
                     </TButton>
                 )}
