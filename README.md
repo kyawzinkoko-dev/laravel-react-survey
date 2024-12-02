@@ -13,7 +13,7 @@
  ```
 2. **Backend**
 ```
-bash
+
 cp .env.example .env
 ```
 configure database username and password according to your machine
@@ -23,7 +23,8 @@ php artisan serve
 ```
 3. **Frontend**
 ```bash
-cd react 
+cd react
+cp .env.example .env 
 npm install 
 npm run dev
 ```
